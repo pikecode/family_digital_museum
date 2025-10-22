@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>家庭文化数字馆 · 静态 Demo</title>
+  <style>
+    /* 轻量移动端风格，仅用于静态演示 */
+    :root { --brand:#2a7cf7; --bg:#f6f7f9; --text:#111; --sub:#666; --card:#fff; --line:#e8e8e8; }
+    * { box-sizing: border-box; }
+    html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font:14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+    a { color:var(--brand); text-decoration:none; }
+    header { position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid var(--line); height:48px; display:flex; align-items:center; padding:0 12px; }
+    header .title { font-weight:600; margin:0 auto; }
+    header .back { cursor:pointer; color:var(--brand); }
+
+    /* 页面容器与路由 */
+    main { padding:12px; padding-bottom:80px; }
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* 卡片与布局 */
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; }
+    .card h3 { margin:4px 0 8px; font-size:16px; }
+    .muted { color:var(--sub); }
+    .btn { display:inline-block; padding:10px 14px; border-radius:8px; border:1px solid var(--brand); color:#fff; background:var(--brand); cursor:pointer; }
+    .btn.ghost { color:var(--brand); background:#fff; }
+    .btn.block { display:block; width:100%; text-align:center; }
+    .btn-row { display:flex; gap:8px; }
+    .list { display:flex; flex-direction:column; gap:8px; }
+    .item { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px; }
+    .item .meta { color:var(--sub); font-size:12px; }
+    .field { margin:8px 0; }
+    .field label { display:block; margin-bottom:4px; color:#444; }
+    .field input, .field textarea, .field select { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+
+    /* 底部 TabBar */
+    .tabbar { position:fixed; bottom:0; left:0; right:0; height:56px; background:#fff; border-top:1px solid var(--line); display:flex; }
+    .tabbar .tab { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; color:#666; cursor:pointer; }
+    .tab.active { color:var(--brand); font-weight:600; }
+
+    /* 轻提示 */
+    .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; padding:8px 12px; border-radius:16px; font-size:12px; display:none; }
+    .toast.show { display:block; }
+
+    /* 简易表格 */
+    table { width:100%; border-collapse:collapse; background:#fff; }
+    th, td { border:1px solid var(--line); padding:8px; text-align:left; }
+    th { background:#fafafa; }
+
+    /* 小徽章 */
+    .badge { display:inline-block; padding:2px 6px; border-radius:999px; background:#eef3ff; color:var(--brand); font-size:12px; margin-left:6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="back" id="backBtn" style="visibility:hidden">返回</div>
+    <div class="title" id="headerTitle">家庭文化数字馆 · Demo</div>
+    <div style="width:50px"></div>
+  </header>
+  <main id="app">
+    <!-- 登录/授权 -->
+    <section class="page" data-route="login">
+      <div class="card">
+        <h3>微信一键登录授权</h3>
+        <p class="muted">本页仅静态演示，无真实登录。点击下方按钮进入引导流程。</p>
+        <div class="btn-row">
+          <button class="btn" onclick="demoLogin()">一键登录</button>
+          <button class="btn ghost" onclick="go('family')">跳过演示</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 家庭引导（未加入时） -->
+    <section class="page" data-route="family-guide">
+      <div class="card">
+        <h3>家庭引导</h3>
+        <p class="muted">你还未加入任何家庭，选择加入现有家庭或创建新家庭。</p>
+        <div class="btn-row">
+          <button class="btn" onclick="go('join')">输入邀请码加入</button>
+          <button class="btn ghost" onclick="go('create')">创建新家庭</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 加入家庭（邀请码） -->
+    <section class="page" data-route="join">
+      <div class="card">
+        <h3>加入家庭</h3>
+        <div class="field">
+          <label>邀请码</label>
+          <input id="inviteCode" placeholder="输入邀请码，例如 FDM-2025" />
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="applyJoin()">提交申请（演示直接通过）</button>
+          <button class="btn ghost" onclick="go('family-guide')">返回</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 创建家庭 -->
+    <section class="page" data-route="create">
+      <div class="card">
+        <h3>创建家庭</h3>
+        <div class="field"><label>家庭名称</label><input id="familyName" placeholder="如：张氏家族" /></div>
+        <div class="field"><label>家庭简介</label><textarea id="familyDesc" rows="3" placeholder="一句话介绍…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn" onclick="createFamily()">创建并成为家主</button>
+          <button class="btn ghost" onclick="go('family-guide')">取消</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 我的家庭（工作台） -->
+    <section class="page" data-route="family">
+      <div id="familyGate"></div>
+      <div id="familyWorkbench" style="display:none">
+        <div class="card">
+          <h3>我的家庭 · 工作台 <span class="badge" id="roleBadge"></span></h3>
+          <div class="grid">
+            <div class="card">
+              <h3>上传/申核素材</h3>
+              <p class="muted">图片/视频/音频/文字素材先进入家庭预审区。</p>
+              <button class="btn block" onclick="go('upload')">去上传</button>
+            </div>
+            <div class="card">
+              <h3>素材库</h3>
+              <p class="muted">已通过审核的素材，用于一键生成视频。</p>
+              <button class="btn block" onclick="go('library')">进入素材库</button>
+            </div>
+            <div class="card">
+              <h3>模板创作</h3>
+              <p class="muted">选择模板，一键生成并可微调。</p>
+              <button class="btn block" onclick="go('templates')">选择模板</button>
+            </div>
+            <div class="card">
+              <h3>邀请成员</h3>
+              <p class="muted">生成专属二维码/邀请码，分享加入。</p>
+              <button class="btn block" onclick="go('invite')">邀请管理</button>
+            </div>
+            <div class="card">
+              <h3>成员管理</h3>
+              <p class="muted">查看成员与角色、处理入馆申请。</p>
+              <button class="btn block" onclick="go('members')">进入管理</button>
+            </div>
+            <div class="card" id="reviewEntry" style="display:none">
+              <h3>审核中心</h3>
+              <p class="muted">管理员/家主可审核预审区素材。</p>
+              <button class="btn block" onclick="go('review')">去审核</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>我的作品</h3>
+          <div class="list">
+            <div class="item">《童年记忆》<div class="meta">3 天前 · 128 次观看</div></div>
+            <div class="item">《家族年会回顾》<div class="meta">1 周前 · 432 次观看</div></div>
+            <button class="btn ghost" onclick="go('works')">查看全部作品</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 上传/申核素材 -->
+    <section class="page" data-route="upload">
+      <div class="card">
+        <h3>上传/申核素材</h3>
+        <div class="field"><label>素材类型</label><select><option>图片</option><option>视频</option><option>音频</option><option>文字</option></select></div>
+        <div class="field"><label>标题</label><input placeholder="例如：爷爷旧照" /></div>
+        <div class="field"><label>说明</label><textarea rows="3" placeholder="可填写拍摄时间、地点、人物等"></textarea></div>
+        <button class="btn" onclick="toast('已提交到预审区（示例）'); go('family')">提交审核</button>
+      </div>
+    </section>
+
+    <!-- 审核列表（管理员/家主） -->
+    <section class="page" data-route="review">
+      <div class="card">
+        <h3>素材审核列表</h3>
+        <table>
+          <thead><tr><th>标题</th><th>类型</th><th>提交者</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>爷爷旧照</td><td>图片</td><td>王小明</td><td><button class="btn" onclick="toast('已通过（示例）')">通过</button> <button class="btn ghost" onclick="toast('已打回（示例）')">打回</button></td></tr>
+            <tr><td>口述历史片段</td><td>音频</td><td>李芳</td><td><button class="btn" onclick="toast('已通过（示例）')">通过</button> <button class="btn ghost" onclick="toast('已打回（示例）')">打回</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 素材库 -->
+    <section class="page" data-route="library">
+      <div class="card">
+        <h3>家庭素材库</h3>
+        <div class="grid">
+          <div class="card"><h3>爷爷旧照</h3><p class="muted">图片 · 1956</p><button class="btn block" onclick="go('templates')">用于创作</button></div>
+          <div class="card"><h3>外婆剪影</h3><p class="muted">图片 · 1962</p><button class="btn block" onclick="go('templates')">用于创作</button></div>
+          <div class="card"><h3>童年合影</h3><p class="muted">图片 · 1999</p><button class="btn block" onclick="go('templates')">用于创作</button></div>
+          <div class="card"><h3>家风口述</h3><p class="muted">音频 · 2005</p><button class="btn block" onclick="go('templates')">用于创作</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 模板选择 -->
+    <section class="page" data-route="templates">
+      <div class="card">
+        <h3>模板选择</h3>
+        <div class="grid">
+          <div class="card"><h3>怀旧照片墙</h3><p class="muted">30 张图 · 1 首配乐</p><button class="btn block" onclick="go('compose')">使用此模板</button></div>
+          <div class="card"><h3>口述史纪实</h3><p class="muted">音频+少量图</p><button class="btn block" onclick="go('compose')">使用此模板</button></div>
+          <div class="card"><h3>家庭年会回顾</h3><p class="muted">图文混剪</p><button class="btn block" onclick="go('compose')">使用此模板</button></div>
+          <div class="card"><h3>重要人物特辑</h3><p class="muted">图文传记</p><button class="btn block" onclick="go('compose')">使用此模板</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 一键生成与微调 -->
+    <section class="page" data-route="compose">
+      <div class="card">
+        <h3>一键生成与微调</h3>
+        <div class="field"><label>配乐</label><select><option>温暖钢琴</option><option>复古留声机</option><option>轻快民谣</option></select></div>
+        <div class="field"><label>片尾标题</label><input placeholder="如：我们的家族记忆" /></div>
+        <button class="btn" onclick="toast('已提交生成任务（示例）'); go('works')">生成视频</button>
+      </div>
+    </section>
+
+    <!-- 作品列表/详情 -->
+    <section class="page" data-route="works">
+      <div class="card">
+        <h3>作品列表</h3>
+        <div class="list">
+          <div class="item" onclick="go('work-detail')">《怀旧照片墙》<div class="meta">刚刚 · 点击查看 · 支持分享</div></div>
+          <div class="item" onclick="go('work-detail')">《家族年会回顾》<div class="meta">1 天前 · 128 次观看</div></div>
+        </div>
+      </div>
+    </section>
+    <section class="page" data-route="work-detail">
+      <div class="card">
+        <h3>作品播放 · 《怀旧照片墙》</h3>
+        <div class="item" style="height:180px; display:flex; align-items:center; justify-content:center; background:#000; color:#fff">视频占位（静态演示）</div>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn" onclick="toast('已复制分享文案（示例）')">复制分享文案</button>
+          <button class="btn ghost" onclick="toast('已生成分享图片（示例）')">生成分享图</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 邀请与成员管理 -->
+    <section class="page" data-route="invite">
+      <div class="card">
+        <h3>邀请管理</h3>
+        <p>专属邀请码：<b id="demoInvite">FDM-2025</b></p>
+        <div class="item" style="text-align:center">二维码占位（静态）</div>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn" onclick="toast('已复制邀请链接（示例）')">复制邀请</button>
+          <button class="btn ghost" onclick="toast('已保存二维码（示例）')">保存二维码</button>
+        </div>
+      </div>
+    </section>
+    <section class="page" data-route="members">
+      <div class="card">
+        <h3>成员管理</h3>
+        <table>
+          <thead><tr><th>成员</th><th>角色</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>你（本人）</td><td id="meRoleCell">成员</td><td><span class="muted">—</span></td></tr>
+            <tr><td>王小明</td><td>成员</td><td><button class="btn ghost" onclick="toast('已设为管理员（示例）')">设为管理员</button></td></tr>
+            <tr><td>李芳</td><td>管理员</td><td><button class="btn ghost" onclick="toast('已移除（示例）')">移除</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 家庭广场（浏览互动） -->
+    <section class="page" data-route="square">
+      <div class="card">
+        <h3>家庭广场</h3>
+        <div class="list">
+          <div class="item">《张氏百年影像展》<div class="meta">1.2 万次观看 · 321 点赞</div></div>
+          <div class="item">《外婆的留声机》<div class="meta">3.4 千次观看 · 88 点赞</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 消息中心 -->
+    <section class="page" data-route="notify">
+      <div class="card">
+        <h3>消息中心</h3>
+        <div class="list">
+          <div class="item">素材《爷爷旧照》审核通过<div class="meta">5 分钟前</div></div>
+          <div class="item">你的加入申请已通过，欢迎进入『我的家庭』<div class="meta">1 天前</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 个人中心/设置/状态切换 -->
+    <section class="page" data-route="profile">
+      <div class="card">
+        <h3>个人中心</h3>
+        <p class="muted">头像与昵称与微信同步（演示占位）。</p>
+        <div class="grid">
+          <div class="card">
+            <h3>我的资产</h3>
+            <p class="muted">我的素材/我的作品/积分明细（演示）。</p>
+            <button class="btn block" onclick="go('works')">我的作品</button>
+          </div>
+          <div class="card">
+            <h3>消息与设置</h3>
+            <div class="btn-row">
+              <button class="btn" onclick="go('notify')">消息中心</button>
+              <button class="btn ghost" onclick="go('settings')">系统设置</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>演示状态切换</h3>
+        <div class="btn-row">
+          <button class="btn" onclick="setJoined(true)">模拟已加入家庭</button>
+          <button class="btn ghost" onclick="setJoined(false)">模拟未加入</button>
+        </div>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn" onclick="setRole('owner')">设为家主</button>
+          <button class="btn" onclick="setRole('admin')">设为管理员</button>
+          <button class="btn ghost" onclick="setRole('member')">设为成员</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-route="settings">
+      <div class="card">
+        <h3>系统设置</h3>
+        <div class="list">
+          <div class="item">通知设置<div class="meta">开启订阅消息（演示）</div></div>
+          <div class="item" onclick="toast('已清理缓存（示例）')">清理缓存</div>
+          <div class="item">关于与隐私</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="tabbar">
+    <div class="tab" data-tab="family" onclick="go('family')">我的家庭</div>
+    <div class="tab" data-tab="square" onclick="go('square')">家庭广场</div>
+    <div class="tab" data-tab="profile" onclick="go('profile')">个人中心</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== 轻量级路由与演示状态（本地存储） =====
+    const initState = { joined:false, role:'member', familyName:'我们的家庭' };
+    const state = loadState();
+
+    function loadState(){
+      try { return Object.assign({}, initState, JSON.parse(localStorage.getItem('fdm-demo')||'{}')); } catch(e){ return { ...initState }; }
+    }
+    function saveState(){ localStorage.setItem('fdm-demo', JSON.stringify(state)); syncUI(); }
+
+    function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1500); }
+    function go(route){ location.hash = '#' + route; }
+
+    function demoLogin(){ toast('登录成功（示例）'); go('family-guide'); }
+    function applyJoin(){ const code = document.getElementById('inviteCode').value.trim(); if(!code){ toast('请输入邀请码'); return; } state.joined=true; saveState(); toast('加入成功，已成为家庭成员'); go('family'); }
+    function createFamily(){ const name = document.getElementById('familyName').value.trim() || '我的新家庭'; state.joined=true; state.role='owner'; state.familyName=name; saveState(); toast('已创建并成为家主'); go('family'); }
+
+    function setJoined(v){ state.joined=!!v; saveState(); toast('状态：'+(v?'已加入家庭':'未加入')); go(v?'family':'family-guide'); }
+    function setRole(r){ state.role=r; saveState(); toast('角色已切换为：'+({'owner':'家主','admin':'管理员','member':'成员'}[r]||r)); go('family'); }
+
+    // 根据路由切换页面与头部/Tab 高亮
+    function syncUI(){
+      const route = (location.hash || '#family').slice(1);
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      const page = document.querySelector(`.page[data-route="${route}"]`) || document.querySelector('.page[data-route="family"]');
+      page.classList.add('active');
+
+      // 顶部标题与返回
+      const titleMap = { 'family':'我的家庭', 'square':'家庭广场', 'profile':'个人中心', 'login':'登录', 'family-guide':'家庭引导', 'join':'加入家庭', 'create':'创建家庭', 'upload':'上传素材', 'review':'审核中心', 'library':'素材库', 'templates':'模板选择', 'compose':'一键生成', 'works':'作品列表', 'work-detail':'作品播放', 'invite':'邀请管理', 'members':'成员管理', 'notify':'消息中心', 'settings':'系统设置' };
+      document.getElementById('headerTitle').textContent = '数字馆 · ' + (titleMap[route] || '页面');
+      document.getElementById('backBtn').style.visibility = ['family','square','profile'].includes(route) ? 'hidden' : 'visible';
+      document.getElementById('backBtn').onclick = ()=>history.back();
+
+      // Tab 高亮
+      document.querySelectorAll('.tabbar .tab').forEach(t=>t.classList.remove('active'));
+      const currentTab = document.querySelector(`.tabbar .tab[data-tab="${['family','square','profile'].includes(route)?route:'family'}"]`);
+      if(currentTab) currentTab.classList.add('active');
+
+      // 我的家庭：根据是否加入展示
+      const gate = document.getElementById('familyGate');
+      const work = document.getElementById('familyWorkbench');
+      const roleBadge = document.getElementById('roleBadge');
+      const reviewEntry = document.getElementById('reviewEntry');
+      const meRoleCell = document.getElementById('meRoleCell');
+      if(route==='family'){
+        if(!state.joined){
+          gate.style.display='block';
+          gate.innerHTML = `<div class="card"><h3>尚未加入家庭</h3><p class="muted">立即加入或创建你的家庭数字馆。</p><div class="btn-row"><button class=\"btn\" onclick=\"go('family-guide')\">开始</button><button class=\"btn ghost\" onclick=\"go('login')\">重新登录</button></div></div>`;
+          work.style.display='none';
+        } else {
+          gate.style.display='none';
+          work.style.display='block';
+          roleBadge.textContent = {owner:'家主', admin:'管理员', member:'成员'}[state.role] || '成员';
+          reviewEntry.style.display = (state.role==='owner' || state.role==='admin') ? 'block' : 'none';
+          meRoleCell.textContent = {owner:'家主', admin:'管理员', member:'成员'}[state.role];
+        }
+      }
+    }
+
+    window.addEventListener('hashchange', syncUI);
+    // 初始路由：若未加入则引导
+    if(!state.joined && (!location.hash || ['#family','#login'].includes(location.hash))) {
+      location.hash = '#family-guide';
+    }
+    syncUI();
+  </script>
+</body>
+</html>

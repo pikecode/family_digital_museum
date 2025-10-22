@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭文化数字馆 - 完整功能演示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #4ECDC4;
+            --dark-color: #333333;
+            --light-color: #F7F9FC;
+            --gray-color: #8D99AE;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            display: none;
+            padding-bottom: 80px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 轻提示 */
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+          background: rgba(0,0,0,.85); color: #fff; padding: 8px 12px; border-radius: 16px; font-size: 12px; display:none; z-index: 999; }
+        .toast.show { display:block; }
+
+        /* 顶部导航 */
+        .header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light-color);
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .icon-btn:hover {
+            background: #eaeef5;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-color);
+            font-size: 12px;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 16px;
+            box-shadow: var(--shadow);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        /* 表单元素 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        /* 列表样式 */
+        .list {
+            list-style: none;
+        }
+        
+        .list-item {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .list-content {
+            flex: 1;
+        }
+        
+        .list-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .list-desc {
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        .list-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* 网格布局 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .grid-item {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .grid-thumb {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #A1C4FD 0%, #C2E9FB 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .grid-info {
+            padding: 12px;
+        }
+        
+        /* 标签样式 */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .badge-success {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+        
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-color);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 107, 53, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-color);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+        
+        /* 页面特定样式 */
+        
+        /* 首页样式 */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-color), #FF8E53);
+            color: white;
+            padding: 24px;
+            margin: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .welcome-desc {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 0 16px;
+        }
+        
+        .feature-item {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+        }
+        
+        .feature-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        /* 家庭页面样式 */
+        .family-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .family-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+        
+        .family-info {
+            flex: 1;
+        }
+        
+        .family-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .family-desc {
+            color: var(--gray-color);
+            margin-bottom: 8px;
+        }
+        
+        .family-stats {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        
+        /* 创作页面样式 */
+        .template-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 0 16px 16px;
+            scrollbar-width: none;
+        }
+        
+        .template-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .template-card {
+            flex: 0 0 auto;
+            width: 160px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .template-thumb {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, #A1C4FD 0%, #C2E9FB 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .template-info {
+            padding: 12px;
+            background: white;
+        }
+        
+        .material-tabs {
+            display: flex;
+            background: white;
+            border-radius: var(--radius);
+            padding: 4px;
+            margin: 0 16px 16px;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 16px;
+        }
+        
+        .material-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .material-thumb {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 广场页面样式 */
+        .video-card {
+            margin-bottom: 16px;
+        }
+        
+        .video-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .video-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .video-user {
+            font-weight: 500;
+        }
+        
+        .video-time {
+            color: var(--gray-color);
+            font-size: 12px;
+        }
+        
+        .video-preview {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .video-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            border-top: 1px solid #eee;
+        }
+        
+        .video-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        /* 个人中心样式 */
+        .profile-header {
+            text-align: center;
+            padding: 30px 16px;
+            background: white;
+            margin-bottom: 16px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .profile-role {
+            color: var(--gray-color);
+            margin-bottom: 16px;
+        }
+        
+        .menu-list {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 0 16px 16px;
+            box-shadow: var(--shadow);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            color: var(--dark-color);
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        
+        .menu-text {
+            font-weight: 500;
+        }
+        
+        .menu-arrow {
+            color: var(--gray-color);
+        }
+        
+        /* 响应式调整 */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 500px;
+                margin: 0 auto;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 登录/授权 -->
+        <div id="login-page" class="page">
+            <div class="header">
+                <h1>登录授权</h1>
+            </div>
+            <div class="card">
+                <div class="card-title">微信一键登录</div>
+                <p style="color:#666;margin-bottom:12px">演示版不接入真实登录，点击下方按钮继续。</p>
+                <button class="btn btn-primary btn-block" onclick="demoLogin()"><i class="fas fa-sign-in-alt"></i> 一键登录</button>
+            </div>
+        </div>
+
+        <!-- 家庭引导（未加入） -->
+        <div id="family-guide-page" class="page">
+            <div class="header">
+                <h1>家庭引导</h1>
+            </div>
+            <div class="card">
+                <div class="card-title">加入或创建家庭</div>
+                <p style="color:#666">你还未加入任何家庭，可选择输入邀请码加入，或创建新的家庭成为家主。</p>
+                <div style="display:flex; gap:12px; margin-top:12px">
+                    <button class="btn btn-primary" style="flex:1" onclick="go('join')"><i class="fas fa-key"></i> 输入邀请码</button>
+                    <button class="btn btn-secondary" style="flex:1" onclick="go('create-family')"><i class="fas fa-plus"></i> 创建家庭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 邀请码加入家庭 -->
+        <div id="join-page" class="page">
+            <div class="header">
+                <h1>加入家庭</h1>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">邀请码</label>
+                    <input id="inviteCode" class="form-input" placeholder="如：FDM-2025" />
+                </div>
+                <button class="btn btn-primary btn-block" onclick="applyJoin()"><i class="fas fa-paper-plane"></i> 提交申请（演示直接通过）</button>
+            </div>
+        </div>
+
+        <!-- 创建家庭 -->
+        <div id="create-family-page" class="page">
+            <div class="header">
+                <h1>创建家庭</h1>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">家庭名称</label>
+                    <input id="familyNameInput" class="form-input" placeholder="如：张氏家族" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">家庭简介</label>
+                    <input class="form-input" placeholder="一句话介绍…" />
+                </div>
+                <button class="btn btn-primary btn-block" onclick="createFamily()"><i class="fas fa-check"></i> 创建并成为家主</button>
+            </div>
+        </div>
+
+        <!-- 首页 -->
+        <div id="home-page" class="page active">
+            <div class="header">
+                <h1>家庭文化数字馆</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                </div>
+            </div>
+            
+            <div class="welcome-card">
+                <h2 class="welcome-title">欢迎回家！</h2>
+                <p class="welcome-desc">记录家庭美好时光，传承家族文化</p>
+                <button class="btn btn-primary" onclick="go('create')">立即创作</button>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-photo-video"></i></div>
+                    <div class="feature-title">家庭素材库</div>
+                    <div class="feature-desc">上传和管理家庭照片视频</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-film"></i></div>
+                    <div class="feature-title">视频创作</div>
+                    <div class="feature-desc">一键生成家庭纪念视频</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <div class="feature-title">家庭广场</div>
+                    <div class="feature-desc">浏览家庭成员的作品</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-store"></i></div>
+                    <div class="feature-title">联盟商家</div>
+                    <div class="feature-desc">兑换积分享受优惠</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    最新动态
+                    <a href="#" style="font-size: 14px; font-weight: normal; color: var(--primary-color);">查看全部</a>
+                </div>
+                
+                <ul class="list">
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-user"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">妈妈</div>
+                            <div class="list-desc">上传了5张新照片</div>
+                        </div>
+                        <div class="list-actions">
+                            <span class="badge badge-primary">新</span>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-user"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">爸爸</div>
+                            <div class="list-desc">发布了一个新视频</div>
+                        </div>
+                        <div class="list-actions">
+                            <span class="badge badge-primary">新</span>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-user"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">系统通知</div>
+                            <div class="list-desc">您有2个素材等待审核</div>
+                        </div>
+                        <div class="list-actions">
+                            <span class="badge badge-warning">待处理</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 家庭页面 -->
+        <div id="family-page" class="page">
+            <div class="header">
+                <h1>我的家庭</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </div>
+            
+            <!-- 未加入家庭时的引导门卫 -->
+            <div id="family-gate" class="card" style="display:none"></div>
+
+            <div id="family-workbench" class="card" style="display:none">
+                <div class="family-header">
+                    <div class="family-avatar"><i class="fas fa-home"></i></div>
+                    <div class="family-info">
+                        <div class="family-name" id="familyName">幸福一家人</div>
+                        <div class="family-desc">5位成员 · 创建于2023年</div>
+                        <div class="family-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">128</div>
+                                <div class="stat-label">素材</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">视频</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">成员</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-title">家庭成员</div>
+                
+                <ul class="list">
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-crown"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">爸爸 (家主)</div>
+                            <div class="list-desc">最后活跃：2小时前</div>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-user-shield"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">妈妈 (管理员)</div>
+                            <div class="list-desc">最后活跃：刚刚</div>
+                        </div>
+                    </li>
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="fas fa-user"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">小明</div>
+                            <div class="list-desc">最后活跃：1天前</div>
+                        </div>
+                    </li>
+                    <li class="list-item" onclick="go('invite')" style="cursor:pointer">
+                        <div class="list-avatar"><i class="fas fa-user-plus"></i></div>
+                        <div class="list-content">
+                            <div class="list-title">邀请新成员</div>
+                            <div class="list-desc">通过邀请码加入家庭</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div id="family-review-card" class="card" style="display:none">
+                <div class="card-title">待审核素材</div>
+                
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="far fa-check-circle"></i></div>
+                    <p>暂无待审核素材</p>
+                </div>
+            </div>
+            
+            <div id="family-actions" class="card" style="display:none">
+                <div class="card-title">快速操作</div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <button class="btn btn-secondary btn-small" style="flex: 1;" onclick="go('upload')"><i class="fas fa-upload"></i> 上传素材</button>
+                    <button class="btn btn-primary btn-small" style="flex: 1;" onclick="go('invite')"><i class="fas fa-user-plus"></i> 邀请成员</button>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 12px;">
+                    <button class="btn btn-secondary btn-small" style="flex: 1;" onclick="go('library')"><i class="fas fa-images"></i> 素材库</button>
+                    <button class="btn btn-secondary btn-small" style="flex: 1;" onclick="go('members')"><i class="fas fa-users-cog"></i> 成员管理</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 创作页面 -->
+        <div id="create-page" class="page">
+            <div class="header">
+                <h1>视频创作</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-history"></i></button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">选择模板</div>
+                
+                <div class="template-scroll">
+                    <div class="template-card">
+                        <div class="template-thumb">家庭聚会</div>
+                        <div class="template-info">
+                            <div class="list-title">温馨家庭</div>
+                            <div class="list-desc">适合家庭聚会</div>
+                        </div>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-thumb">旅行记忆</div>
+                        <div class="template-info">
+                            <div class="list-title">旅行记录</div>
+                            <div class="list-desc">记录美好旅程</div>
+                        </div>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-thumb">节日庆典</div>
+                        <div class="template-info">
+                            <div class="list-title">节日特辑</div>
+                            <div class="list-desc">节日专属模板</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">选择素材</div>
+                
+                <div class="material-tabs">
+                    <div class="tab active">图片</div>
+                    <div class="tab">视频</div>
+                    <div class="tab">文字</div>
+                </div>
+                
+                <div class="material-grid">
+                    <div class="material-item">
+                        <div class="material-thumb">海边旅行</div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-thumb">家庭聚餐</div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-thumb">生日派对</div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-thumb">公园游玩</div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-thumb">春节团圆</div>
+                    </div>
+                    <div class="material-item">
+                        <div class="material-thumb" style="background: #eee; color: var(--gray-color);">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 0 16px;">
+                <button class="btn btn-primary btn-block">
+                    <i class="fas fa-magic"></i> 一键生成视频
+                </button>
+            </div>
+        </div>
+        
+        <!-- 广场页面 -->
+        <div id="square-page" class="page">
+            <div class="header">
+                <h1>家庭广场</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-sort"></i></button>
+                </div>
+            </div>
+            
+            <div class="card video-card">
+                <div class="video-header">
+                    <div class="video-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="video-user">妈妈</div>
+                        <div class="video-time">2小时前</div>
+                    </div>
+                </div>
+                
+                <p style="margin-bottom: 12px;">记录我们上周的家庭旅行，美好的回忆值得珍藏！</p>
+                
+                <div class="video-preview">家庭旅行视频</div>
+                
+                <div class="video-actions">
+                    <div class="video-action"><i class="far fa-heart"></i> 12</div>
+                    <div class="video-action"><i class="far fa-comment"></i> 5</div>
+                    <div class="video-action"><i class="fas fa-share"></i> 分享</div>
+                </div>
+            </div>
+            
+            <div class="card video-card">
+                <div class="video-header">
+                    <div class="video-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="video-user">爸爸</div>
+                        <div class="video-time">1天前</div>
+                    </div>
+                </div>
+                
+                <p style="margin-bottom: 12px;">小明的生日派对，时间过得真快，转眼就8岁了！</p>
+                
+                <div class="video-preview">生日派对视频</div>
+                
+                <div class="video-actions">
+                    <div class="video-action"><i class="far fa-heart"></i> 24</div>
+                    <div class="video-action"><i class="far fa-comment"></i> 8</div>
+                    <div class="video-action"><i class="fas fa-share"></i> 分享</div>
+                </div>
+            </div>
+            
+            <div class="card video-card">
+                <div class="video-header">
+                    <div class="video-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="video-user">爷爷</div>
+                        <div class="video-time">3天前</div>
+                    </div>
+                </div>
+                
+                <p style="margin-bottom: 12px;">翻看老照片制作的回忆视频，时光荏苒，珍惜当下。</p>
+                
+                <div class="video-preview">老照片回忆</div>
+                
+                <div class="video-actions">
+                    <div class="video-action"><i class="far fa-heart"></i> 36</div>
+                    <div class="video-action"><i class="far fa-comment"></i> 12</div>
+                    <div class="video-action"><i class="fas fa-share"></i> 分享</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 个人中心页面 -->
+        <div id="profile-page" class="page">
+            <div class="header">
+                <h1>个人中心</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </div>
+            
+            <div class="profile-header">
+                <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                <div class="profile-name">小明</div>
+                <div class="profile-role">家庭成员</div>
+                <button class="btn btn-secondary btn-small">编辑资料</button>
+            </div>
+            
+            <div class="menu-list">
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div class="menu-text">我的上传</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-film"></i></div>
+                        <div class="menu-text">我的作品</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-star"></i></div>
+                        <div class="menu-text">我的收藏</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-bell"></i></div>
+                        <div class="menu-text">消息通知</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+            </div>
+            
+            <div class="menu-list">
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="menu-text">隐私设置</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
+                        <div class="menu-text">帮助与反馈</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="#" class="menu-item">
+                    <div class="menu-left">
+                        <div class="menu-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="menu-text">关于我们</div>
+                    </div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+            </div>
+            
+            <div style="padding: 0 16px; margin-top: 30px;">
+                <button class="btn btn-secondary btn-block">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </button>
+            </div>
+
+            <!-- 演示状态切换 -->
+            <div class="card" style="margin-top:16px">
+                <div class="card-title">演示状态切换</div>
+                <div style="display:flex; gap:12px; margin-bottom:8px">
+                    <button class="btn btn-primary btn-small" onclick="setJoined(true)">设为已加入</button>
+                    <button class="btn btn-secondary btn-small" onclick="setJoined(false)">设为未加入</button>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-secondary btn-small" onclick="setRole('owner')">家主</button>
+                    <button class="btn btn-secondary btn-small" onclick="setRole('admin')">管理员</button>
+                    <button class="btn btn-secondary btn-small" onclick="setRole('member')">成员</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 上传/申核素材 -->
+        <div id="upload-page" class="page">
+            <div class="header"><h1>上传/申核素材</h1></div>
+            <div class="card">
+                <div class="form-group"><label class="form-label">素材类型</label>
+                    <select class="form-input"><option>图片</option><option>视频</option><option>音频</option><option>文字</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">标题</label><input class="form-input" placeholder="如：爷爷旧照" /></div>
+                <div class="form-group"><label class="form-label">说明</label><input class="form-input" placeholder="补充拍摄时间/地点/人物…" /></div>
+                <button class="btn btn-primary btn-block" onclick="submitUpload()"><i class="fas fa-paper-plane"></i> 提交审核</button>
+            </div>
+        </div>
+
+        <!-- 素材审核（管理员/家主） -->
+        <div id="review-page" class="page">
+            <div class="header"><h1>素材审核</h1></div>
+            <div class="card">
+                <div class="card-title">待审核列表</div>
+                <ul class="list">
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="far fa-image"></i></div>
+                        <div class="list-content"><div class="list-title">爷爷旧照</div><div class="list-desc">提交者：王小明</div></div>
+                        <div class="list-actions"><button class="btn btn-success btn-small" onclick="toast('已通过（示例）')">通过</button><button class="btn btn-secondary btn-small" onclick="toast('已打回（示例）')">打回</button></div>
+                    </li>
+                    <li class="list-item">
+                        <div class="list-avatar"><i class="far fa-file-audio"></i></div>
+                        <div class="list-content"><div class="list-title">家风口述</div><div class="list-desc">提交者：李芳</div></div>
+                        <div class="list-actions"><button class="btn btn-success btn-small" onclick="toast('已通过（示例）')">通过</button><button class="btn btn-secondary btn-small" onclick="toast('已打回（示例）')">打回</button></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 家庭素材库 -->
+        <div id="library-page" class="page">
+            <div class="header"><h1>素材库</h1></div>
+            <div class="card">
+                <div class="card-title">已通过素材</div>
+                <div class="grid" style="padding: 0 0 8px 0; margin: 0 16px 16px;">
+                    <div class="grid-item"><div class="grid-thumb">爷爷旧照</div><div class="grid-info"><div class="list-desc">图片 · 1956</div><button class="btn btn-secondary btn-small btn-block" onclick="go('create')">用于创作</button></div></div>
+                    <div class="grid-item"><div class="grid-thumb">外婆剪影</div><div class="grid-info"><div class="list-desc">图片 · 1962</div><button class="btn btn-secondary btn-small btn-block" onclick="go('create')">用于创作</button></div></div>
+                    <div class="grid-item"><div class="grid-thumb">童年合影</div><div class="grid-info"><div class="list-desc">图片 · 1999</div><button class="btn btn-secondary btn-small btn-block" onclick="go('create')">用于创作</button></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作品列表与详情 -->
+        <div id="works-page" class="page">
+            <div class="header"><h1>我的作品</h1></div>
+            <div class="card">
+                <ul class="list">
+                    <li class="list-item" onclick="go('work-detail')" style="cursor:pointer"><div class="list-avatar"><i class="fas fa-film"></i></div><div class="list-content"><div class="list-title">《怀旧照片墙》</div><div class="list-desc">刚刚 · 点击查看 · 支持分享</div></div></li>
+                    <li class="list-item" onclick="go('work-detail')" style="cursor:pointer"><div class="list-avatar"><i class="fas fa-film"></i></div><div class="list-content"><div class="list-title">《家族年会回顾》</div><div class="list-desc">1 天前 · 128 次观看</div></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="work-detail-page" class="page">
+            <div class="header"><h1>作品播放</h1></div>
+            <div class="card">
+                <div class="video-preview" style="height:200px; display:flex; align-items:center; justify-content:center; background:#000; color:#fff">视频占位（静态演示）</div>
+                <div style="display:flex; gap:12px; margin-top:12px">
+                    <button class="btn btn-primary" onclick="toast('已复制分享文案（示例）')"><i class="fas fa-copy"></i> 复制分享文案</button>
+                    <button class="btn btn-secondary" onclick="toast('已生成分享图片（示例）')"><i class="fas fa-image"></i> 生成分享图</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 邀请与成员管理 -->
+        <div id="invite-page" class="page">
+            <div class="header"><h1>邀请管理</h1></div>
+            <div class="card">
+                <p>专属邀请码：<b id="inviteCodeText">FDM-2025</b></p>
+                <div class="video-preview" style="height:160px; display:flex; align-items:center; justify-content:center; color:#666; background:#fafafa; border:1px dashed #ddd;">二维码占位（静态）</div>
+                <div style="display:flex; gap:12px; margin-top:12px">
+                    <button class="btn btn-primary" onclick="toast('已复制邀请链接（示例）')"><i class="fas fa-link"></i> 复制邀请</button>
+                    <button class="btn btn-secondary" onclick="toast('已保存二维码（示例）')"><i class="fas fa-qrcode"></i> 保存二维码</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="members-page" class="page">
+            <div class="header"><h1>成员管理</h1></div>
+            <div class="card">
+                <ul class="list">
+                    <li class="list-item"><div class="list-avatar"><i class="fas fa-user"></i></div><div class="list-content"><div class="list-title">你（本人）</div><div class="list-desc" id="meRole">成员</div></div><div class="list-actions"><span class="badge badge-success">在线</span></div></li>
+                    <li class="list-item"><div class="list-avatar"><i class="fas fa-user"></i></div><div class="list-content"><div class="list-title">王小明</div><div class="list-desc">成员</div></div><div class="list-actions"><button class="btn btn-secondary btn-small" onclick="toast('已设为管理员（示例）')">设为管理员</button></div></li>
+                    <li class="list-item"><div class="list-avatar"><i class="fas fa-user-shield"></i></div><div class="list-content"><div class="list-title">李芳</div><div class="list-desc">管理员</div></div><div class="list-actions"><button class="btn btn-secondary btn-small" onclick="toast('已移除（示例）')">移除</button></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 消息中心与系统设置 -->
+        <div id="notify-page" class="page">
+            <div class="header"><h1>消息中心</h1></div>
+            <div class="card">
+                <ul class="list">
+                    <li class="list-item"><div class="list-avatar"><i class="far fa-bell"></i></div><div class="list-content"><div class="list-title">素材《爷爷旧照》审核通过</div><div class="list-desc">5 分钟前</div></div></li>
+                    <li class="list-item"><div class="list-avatar"><i class="far fa-bell"></i></div><div class="list-content"><div class="list-title">你的加入申请已通过</div><div class="list-desc">1 天前</div></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="settings-page" class="page">
+            <div class="header"><h1>系统设置</h1></div>
+            <div class="card">
+                <ul class="list">
+                    <li class="list-item" onclick="toast('已清理缓存（示例）')" style="cursor:pointer"><div class="list-avatar"><i class="fas fa-broom"></i></div><div class="list-content"><div class="list-title">清理缓存</div><div class="list-desc">释放本地存储</div></div></li>
+                    <li class="list-item"><div class="list-avatar"><i class="fas fa-bell"></i></div><div class="list-content"><div class="list-title">通知设置</div><div class="list-desc">开启订阅消息（示例）</div></div></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#home" class="nav-item" data-route="home">
+                <div class="nav-icon"><i class="fas fa-home"></i></div>
+                <div>首页</div>
+            </a>
+            <a href="#family" class="nav-item" data-route="family">
+                <div class="nav-icon"><i class="fas fa-users"></i></div>
+                <div>家庭</div>
+            </a>
+            <a href="#create" class="nav-item" data-route="create">
+                <div class="nav-icon"><i class="fas fa-plus-circle"></i></div>
+                <div>创作</div>
+            </a>
+            <a href="#square" class="nav-item" data-route="square">
+                <div class="nav-icon"><i class="fas fa-compass"></i></div>
+                <div>广场</div>
+            </a>
+            <a href="#profile" class="nav-item" data-route="profile">
+                <div class="nav-icon"><i class="fas fa-user"></i></div>
+                <div>我的</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 轻提示
+        function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1400); }
+
+        // ====== 简易状态与路由（本地存储） ======
+        const initState = { joined:false, role:'member', familyName:'幸福一家人' };
+        function loadState(){ try{ return Object.assign({}, initState, JSON.parse(localStorage.getItem('fdm-demo')||'{}')); }catch(e){ return { ...initState }; } }
+        const state = loadState();
+        function saveState(){ localStorage.setItem('fdm-demo', JSON.stringify(state)); }
+
+        function go(route){ location.hash = '#' + route; }
+
+        function syncNav(route){
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(n=>n.classList.remove('active'));
+            const tab = document.querySelector(`.bottom-nav .nav-item[data-route="${route}"]`);
+            if(tab) tab.classList.add('active');
+        }
+
+        function showPage(route){
+            // 处理默认与别名
+            const pageId = {
+                home:'home-page', family:'family-page', create:'create-page', square:'square-page', profile:'profile-page',
+                login:'login-page', 'family-guide':'family-guide-page', join:'join-page', 'create-family':'create-family-page',
+                upload:'upload-page', review:'review-page', library:'library-page', works:'works-page', 'work-detail':'work-detail-page',
+                invite:'invite-page', members:'members-page', notify:'notify-page', settings:'settings-page'
+            }[route] || 'home-page';
+
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            const page = document.getElementById(pageId); if(page) page.classList.add('active');
+
+            // 如果进入 family 页面，根据是否加入展示不同内容
+            if(route==='family') renderFamily();
+
+            // 高亮底部导航
+            if(['home','family','create','square','profile'].includes(route)) syncNav(route);
+        }
+
+        function renderFamily(){
+            const gate = document.getElementById('family-gate');
+            const work = document.getElementById('family-workbench');
+            const actions = document.getElementById('family-actions');
+            const reviewCard = document.getElementById('family-review-card');
+            document.getElementById('familyName').textContent = state.familyName || '我的家庭';
+            document.getElementById('meRole').textContent = {owner:'家主', admin:'管理员', member:'成员'}[state.role];
+
+            if(!state.joined){
+                gate.style.display='block';
+                work.style.display='none';
+                actions.style.display='none';
+                reviewCard.style.display='none';
+                gate.innerHTML = '<div class="card-title">尚未加入家庭</div><p style="color:#666">前往引导页完成加入或创建家庭。</p><div style="display:flex;gap:12px;margin-top:12px"><button class="btn btn-primary" onclick="go(\'family-guide\')">开始</button><button class="btn btn-secondary" onclick="go(\'login\')">登录</button></div>';
+            } else {
+                gate.style.display='none';
+                work.style.display='block';
+                actions.style.display='block';
+                reviewCard.style.display = (state.role==='owner' || state.role==='admin') ? 'block' : 'none';
+            }
+        }
+
+        function demoLogin(){ toast('登录成功（示例）'); go('family-guide'); }
+        function applyJoin(){ const code=document.getElementById('inviteCode').value.trim(); if(!code){ toast('请输入邀请码'); return; } state.joined=true; saveState(); toast('加入成功'); go('family'); }
+        function createFamily(){ const name=document.getElementById('familyNameInput').value.trim()||'我的新家庭'; state.joined=true; state.role='owner'; state.familyName=name; saveState(); toast('已创建并成为家主'); go('family'); }
+        function submitUpload(){ if(!state.joined){ toast('请先加入家庭'); go('family-guide'); return;} toast('已提交到预审区（示例）'); go('family'); }
+        function setJoined(v){ state.joined=!!v; saveState(); toast('状态：'+(v?'已加入':'未加入')); if(v) go('family'); else go('family-guide'); }
+        function setRole(r){ state.role=r; saveState(); toast('角色：'+({'owner':'家主','admin':'管理员','member':'成员'}[r]||r)); go('family'); }
+
+        // 页面交互：模板/素材高亮选择（保留原有）
+        function bindPageInteractions(){
+            document.querySelectorAll('.tab').forEach(tab=>{
+                tab.addEventListener('click',function(){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); this.classList.add('active'); });
+            });
+            document.querySelectorAll('.template-card').forEach(c=>{ c.addEventListener('click', function(){ document.querySelectorAll('.template-card').forEach(x=>x.style.border='none'); this.style.border='2px solid var(--primary-color)'; }); });
+            document.querySelectorAll('.material-item').forEach(it=>{ it.addEventListener('click', function(){ this.style.border = (this.style.border? '': '2px solid var(--primary-color)'); }); });
+        }
+
+        window.addEventListener('hashchange', ()=>{ const route=(location.hash||'#home').slice(1); showPage(route); });
+        document.addEventListener('DOMContentLoaded', ()=>{
+            bindPageInteractions();
+            const initRoute = (location.hash||'#home').slice(1);
+            showPage(initRoute);
+        });
+    </script>
+</body>
+</html>
