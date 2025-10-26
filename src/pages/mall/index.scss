@@ -1,0 +1,46 @@
+$primary-color: #d4af37;
+$bg-color: #f9f7f4;
+
+.mall-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $bg-color;
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+
+    .empty-icon {
+      display: block;
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .empty-title {
+      display: block;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .empty-desc {
+      display: block;
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+
+    .empty-note {
+      display: block;
+      font-size: 13px;
+      color: $primary-color;
+      padding: 12px 20px;
+      background-color: rgba(212, 175, 55, 0.1);
+      border-radius: 6px;
+      border-left: 3px solid $primary-color;
+    }
+  }
+}

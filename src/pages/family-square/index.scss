@@ -1,0 +1,240 @@
+$primary-color: #d4af37;
+$secondary-color: #8b6914;
+$text-color: #333;
+$bg-color: #f9f7f4;
+$border-color: #ddd;
+
+.family-square-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $bg-color;
+
+  // 顶部导航和搜索
+  .square-header {
+    padding: 12px 16px;
+    background-color: white;
+    border-bottom: 1px solid $border-color;
+    z-index: 10;
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #f5f3f0;
+      border-radius: 20px;
+      padding: 8px 16px;
+
+      .search-input {
+        flex: 1;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        font-size: 14px;
+        color: $text-color;
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+
+      .search-btn {
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:active {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+
+  // Tab 切换
+  .square-tabs {
+    display: flex;
+    background-color: white;
+    border-bottom: 1px solid $border-color;
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      font-size: 16px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+
+      &.active {
+        color: $primary-color;
+        font-weight: bold;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: $primary-color;
+        }
+      }
+    }
+  }
+
+  // 内容区
+  .square-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+
+    .posts-list {
+      .post-card {
+        background-color: white;
+        margin-bottom: 8px;
+        padding: 16px;
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+
+        // 发布者信息
+        .post-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+
+          .author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+
+            .author-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+
+            .author-details {
+              flex: 1;
+
+              .author-name {
+                display: block;
+                font-size: 15px;
+                font-weight: bold;
+                color: $text-color;
+              }
+
+              .post-time {
+                display: block;
+                font-size: 12px;
+                color: #999;
+              }
+            }
+          }
+
+          .follow-btn {
+            padding: 6px 12px;
+            background-color: $primary-color;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:active {
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // 内容文本
+        .post-content {
+          margin-bottom: 12px;
+
+          .content-text {
+            display: block;
+            font-size: 15px;
+            line-height: 1.6;
+            color: $text-color;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+        }
+
+        // 图片
+        .post-images {
+          display: grid;
+          gap: 8px;
+          margin-bottom: 12px;
+
+          &.single {
+            grid-template-columns: 1fr;
+          }
+
+          .post-image {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &.single {
+              max-height: 400px;
+            }
+
+            &.multi {
+              max-height: 200px;
+            }
+
+            &:hover {
+              transform: scale(1.01);
+            }
+          }
+        }
+
+        // 底部互动
+        .post-footer {
+          border-top: 1px solid $border-color;
+          padding-top: 12px;
+
+          .action-group {
+            display: flex;
+            justify-content: space-around;
+
+            .action-item {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+              padding: 8px;
+              font-size: 13px;
+              color: #666;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              border-radius: 4px;
+
+              &:hover {
+                background-color: #f5f3f0;
+                color: $primary-color;
+              }
+
+              .action-icon {
+                font-size: 16px;
+              }
+
+              .action-count,
+              .action-label {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

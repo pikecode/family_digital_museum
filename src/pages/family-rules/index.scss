@@ -1,0 +1,224 @@
+$primary-color: #d4af37;
+$secondary-color: #8b6914;
+$text-color: #333;
+$bg-color: #f9f7f4;
+$border-color: #ddd;
+
+.family-rules-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $bg-color;
+
+  // 规则页头部
+  .rules-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: white;
+    border-bottom: 1px solid $border-color;
+    z-index: 10;
+
+    .back-btn {
+      font-size: 16px;
+      color: $primary-color;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: all 0.3s ease;
+
+      &:active {
+        opacity: 0.7;
+      }
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: $text-color;
+    }
+  }
+
+  // 规则内容区
+  .rules-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+
+    // 核心家训卡
+    .core-rule {
+      background: linear-gradient(135deg, $secondary-color 0%, $primary-color 100%);
+      border-radius: 8px;
+      padding: 30px 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '~ 核心家训 ~';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.05) 2px,
+            rgba(255, 255, 255, 0.05) 4px
+          );
+        pointer-events: none;
+      }
+
+      .rule-scroll-frame {
+        position: relative;
+        z-index: 1;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.05);
+        margin-bottom: 12px;
+
+        .rule-text {
+          display: block;
+          font-size: 20px;
+          font-weight: bold;
+          color: white;
+          line-height: 1.6;
+          letter-spacing: 2px;
+        }
+      }
+
+      .rule-desc {
+        display: block;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        position: relative;
+        z-index: 1;
+      }
+    }
+
+    // 具体家规列表
+    .rules-list {
+      .rule-item {
+        background-color: white;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        .rule-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background-color: #f9f7f4;
+          }
+
+          .rule-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+
+            .category-badge {
+              display: inline-block;
+              padding: 4px 10px;
+              background-color: $primary-color;
+              color: white;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: bold;
+              white-space: nowrap;
+            }
+
+            .title {
+              font-size: 16px;
+              font-weight: bold;
+              color: $text-color;
+            }
+          }
+
+          .expand-icon {
+            font-size: 12px;
+            color: #999;
+            transition: transform 0.3s ease;
+
+            &.expanded {
+              transform: rotate(180deg);
+            }
+          }
+        }
+
+        .rule-body {
+          padding: 12px 16px 16px;
+          border-top: 1px solid $border-color;
+          background-color: #f9f7f4;
+
+          .rule-content {
+            display: block;
+            font-size: 14px;
+            line-height: 1.8;
+            color: $text-color;
+            margin-bottom: 12px;
+          }
+
+          .rule-story {
+            background-color: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid $primary-color;
+            margin-bottom: 12px;
+
+            .story-label {
+              display: block;
+              font-size: 12px;
+              color: $primary-color;
+              font-weight: bold;
+              margin-bottom: 6px;
+            }
+
+            .story-text {
+              display: block;
+              font-size: 13px;
+              color: #666;
+              line-height: 1.6;
+            }
+          }
+
+          .rule-actions {
+            text-align: right;
+
+            .action-link {
+              color: $primary-color;
+              font-size: 13px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+
+              &:hover {
+                opacity: 0.8;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

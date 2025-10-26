@@ -1,0 +1,47 @@
+{
+  "name": "family-digital-museum",
+  "version": "1.0.0",
+  "description": "家庭数字馆小程序",
+  "private": true,
+  "scripts": {
+    "dev:weapp": "taro build --type weapp --watch",
+    "dev:h5": "taro build --type h5 --watch",
+    "build:weapp": "taro build --type weapp",
+    "build:h5": "taro build --type h5",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tarojs/components": "^4.1.7",
+    "@tarojs/react": "^4.1.7",
+    "@tarojs/runtime": "^4.1.7",
+    "@tarojs/shared": "^4.1.7",
+    "@tarojs/taro": "^4.1.7",
+    "@tarojs/webpack5-runner": "^4.1.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "taro-ui": "^3.3.0",
+    "zustand": "^4.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-react": "^7.28.5",
+    "@tarojs/cli": "^4.1.7",
+    "@tarojs/helper": "^4.1.7",
+    "@tarojs/plugin-framework-react": "^4.1.7",
+    "@tarojs/plugin-platform-h5": "^4.1.7",
+    "@tarojs/plugin-platform-weapp": "^4.1.7",
+    "@tarojs/service": "^4.1.7",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "babel-preset-taro": "^4.1.7",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.32.0",
+    "less": "^4.2.0",
+    "postcss": "^8.4.31",
+    "typescript": "^5.0.0",
+    "webpack": "5.91.0"
+  }
+}
